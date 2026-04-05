@@ -15,6 +15,7 @@ namespace CalculadorPrestamos
         public Form1()
         {
             InitializeComponent();
+            ConfigurarTabla();
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -79,6 +80,7 @@ namespace CalculadorPrestamos
 
         private void button1_Click(object sender, EventArgs e)
         {
+            ConfigurarTabla();
             if (string.IsNullOrWhiteSpace(textBoxMontoSolicitado.Text))
             {
                 MessageBox.Show("Debe ingresar un valor en Monto Solicitado.", "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -108,9 +110,50 @@ namespace CalculadorPrestamos
             }
         }
 
-        private decimal[,] AmortizacionFrancesa()
+        private decimal[,] AmortizacionFrancesa(decimal monto, decimal tasaInteresAnual, int plazoMeses)
+        {
+             //como 
+        }
+        private decimal[,] AmortizacionAlemana(decimal monto, decimal tasaInteresAnual, int plazoMeses)
         {
 
         }
+        private void ExportarExcel()
+        {
+
+        }
+        private void ConfigurarTabla()
+        {
+            dataGridViewAmortizacion.Columns.Clear();
+            dataGridViewAmortizacion.Rows.Clear();
+
+            dataGridViewAmortizacion.Columns.Add("Cuotas", "Cuotas");
+            dataGridViewAmortizacion.Columns.Add("FechaPago", "Fecha de pago");
+            dataGridViewAmortizacion.Columns.Add("Capital", "Capital");
+            dataGridViewAmortizacion.Columns.Add("Interes", "Interés");
+            dataGridViewAmortizacion.Columns.Add("SeguroDesgravamen", "Seguros desg.");
+            dataGridViewAmortizacion.Columns.Add("SeguroIncendios", "Seguro Incendios/Vehiculo");
+            dataGridViewAmortizacion.Columns.Add("ValorCuota", "Valor cuota");
+            dataGridViewAmortizacion.Columns.Add("Saldo", "Saldo");
+
+            dataGridViewAmortizacion.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+
+        private void LlenarGridConMatriz(decimal[,] matriz, int filas)
+        {
+            ConfigurarTabla();
+
+            for (int i = 0; i < filas; i++)
+            {
+                dataGridViewAmortizacion.Rows.Add(
+                    matriz[i, 0],
+                    Math.Round(matriz[i, 1], 2), 
+                    Math.Round(matriz[i, 2], 2),
+                    Math.Round(matriz[i, 3], 2),
+                    Math.Round(matriz[i, 4], 2)
+                );
+            }
+        }
+
     }
 }
