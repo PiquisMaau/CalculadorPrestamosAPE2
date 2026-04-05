@@ -98,7 +98,17 @@ namespace CalculadorPrestamos
                 return;
             }
 
-            LlenarGridConMatriz(AmortizacionAlemana(Convert.ToDecimal(textBoxMontoSolicitado.Text), Convert.ToInt32(numericUpDownTiempoPagar.Value), numericUpDownTasaInteres.Value), Convert.ToInt32(numericUpDownTiempoPagar.Value), fechaBase);
+            if (comboBoxAmortizacion.Text == "ALEMANA") 
+            {
+                LlenarGridConMatriz(AmortizacionAlemana(Convert.ToDecimal(textBoxMontoSolicitado.Text), Convert.ToInt32(numericUpDownTiempoPagar.Value), numericUpDownTasaInteres.Value), Convert.ToInt32(numericUpDownTiempoPagar.Value), fechaBase);
+
+            }
+            if (comboBoxAmortizacion.Text == "FRANCESA")
+            {
+                LlenarGridConMatriz(AmortizacionFrancesa(Convert.ToDecimal(textBoxMontoSolicitado.Text), Convert.ToInt32(numericUpDownTiempoPagar.Value), numericUpDownTasaInteres.Value), Convert.ToInt32(numericUpDownTiempoPagar.Value), fechaBase);
+
+            }
+
         }
 
         private void button1_KeyPress(object sender, KeyPressEventArgs e)
@@ -142,6 +152,48 @@ namespace CalculadorPrestamos
 
                 tabla[i, 0] = i + 1;
                 tabla[i, 1] = amortizacionConstante;
+                tabla[i, 2] = interesMes;
+                tabla[i, 3] = seguroDesg;
+                tabla[i, 4] = seguroInc;
+                tabla[i, 5] = valorCuota;
+                tabla[i, 6] = Math.Abs(saldo);
+            }
+
+            return tabla;
+        }
+        public decimal[,] AmortizacionFrancesa(decimal monto, int cuotas, decimal tasaInteresAnual)
+        {
+            decimal tasaInteresMensual = (tasaInteresAnual / 100m) / 12m;
+            decimal tasaSeguroDesg = 0.0014m;
+            decimal tasaSeguroIncendios = 0.00m;
+
+            double i_double = (double)tasaInteresMensual;
+            double n_double = (double)cuotas;
+            double cuotaBaseDouble = (double)monto * (i_double / (1.0 - Math.Pow(1.0 + i_double, -n_double)));
+            decimal cuotaFijaBase = (decimal)cuotaBaseDouble;
+
+            decimal saldo = monto;
+            decimal[,] tabla = new decimal[cuotas, 7];
+
+            for (int i = 0; i < cuotas; i++)
+            {
+                decimal interesMes = saldo * tasaInteresMensual;
+                decimal amortizacionCapital = cuotaFijaBase - interesMes;
+
+                if (i == cuotas - 1)
+                {
+                    amortizacionCapital = saldo;
+                }
+
+                decimal seguroDesg = saldo * tasaSeguroDesg;
+                decimal seguroInc = saldo * tasaSeguroIncendios;
+
+                decimal valorCuota = amortizacionCapital + interesMes + seguroDesg + seguroInc;
+
+                saldo = saldo - amortizacionCapital;
+
+                tabla[i, 0] = i + 1;
+                tabla[i, 1] = amortizacionCapital;
                 tabla[i, 2] = interesMes;
                 tabla[i, 3] = seguroDesg;
                 tabla[i, 4] = seguroInc;
@@ -195,5 +247,20 @@ namespace CalculadorPrestamos
             }
         }
 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            textBoxMontoSolicitado.Clear();
+
+            numericUpDownTiempoPagar.Value = numericUpDownTiempoPagar.Minimum;
+            numericUpDownTasaInteres.Value = numericUpDownTasaInteres.Minimum;
+
+            comboBoxTipoCredito.SelectedIndex = -1;
+            comboBoxAmortizacion.SelectedIndex = -1;
+
+            dataGridViewAmortizacion.Rows.Clear();
+            dataGridViewAmortizacion.Columns.Clear();
+
+            textBoxMontoSolicitado.Focus();
+        }
     }
 }
