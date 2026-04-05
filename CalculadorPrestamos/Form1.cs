@@ -98,7 +98,7 @@ namespace CalculadorPrestamos
                 return;
             }
 
-            LlenarGridConMatriz(AmortizacionAlemana(), Convert.ToInt32(numericUpDownTiempoPagar.Value), fechaBase);
+            LlenarGridConMatriz(AmortizacionAlemana(Convert.ToDecimal(textBoxMontoSolicitado.Text), Convert.ToInt32(numericUpDownTiempoPagar.Value), numericUpDownTasaInteres.Value), Convert.ToInt32(numericUpDownTiempoPagar.Value), fechaBase);
         }
 
         private void button1_KeyPress(object sender, KeyPressEventArgs e)
@@ -119,33 +119,36 @@ namespace CalculadorPrestamos
         //     //como 
 
         //}
-        public decimal[,] AmortizacionAlemana()
+        public decimal[,] AmortizacionAlemana(decimal monto, int cuotas, decimal tasaInteresAnual)
         {
-            double monto = Convert.ToDouble(textBoxMontoSolicitado.Text);
-            int cuotas = Convert.ToInt32(numericUpDownTiempoPagar.Value);
-            double tasaInteresMensual = Convert.ToDouble(numericUpDownTasaInteres.Value) / 1200;
-            double tasaSeguro = 0.0014;
-            double gasto = monto * 0.005;
-            double capital = monto - gasto;
-            double amortizacion = Math.Round(capital / cuotas, 0);
-            double saldo = capital;
+            decimal tasaInteresMensual = (tasaInteresAnual / 100m) / 12m;
+            decimal tasaSeguroDesg = 0.0014m;
+            decimal tasaSeguroIncendios = 0.00m;
+
+            decimal amortizacionConstante = monto / cuotas;
+            decimal saldo = monto;
+
             decimal[,] tabla = new decimal[cuotas, 7];
+
             for (int i = 0; i < cuotas; i++)
             {
-                double amortizacionCuota = amortizacion;
-                double interes = saldo * tasaInteresMensual;
-                double seguro = saldo * tasaSeguro;
-                double valorCuota = amortizacionCuota + interes + seguro;
-                double saldoFinal = saldo - amortizacionCuota;
+                decimal interesMes = saldo * tasaInteresMensual;
+                decimal seguroDesg = saldo * tasaSeguroDesg;
+                decimal seguroInc = saldo * tasaSeguroIncendios;
+
+                decimal valorCuota = amortizacionConstante + interesMes + seguroDesg + seguroInc;
+
+                saldo = saldo - amortizacionConstante;
+
                 tabla[i, 0] = i + 1;
-                tabla[i, 1] = Convert.ToDecimal(Math.Round(amortizacionCuota, 0));
-                tabla[i, 2] = Convert.ToDecimal(interes);
-                tabla[i, 3] = Convert.ToDecimal(seguro);
-                tabla[i, 4] = 0;
-                tabla[i, 5] = Convert.ToDecimal(valorCuota);
-                tabla[i, 6] = Convert.ToDecimal(saldoFinal);
-                saldo = saldoFinal;
+                tabla[i, 1] = amortizacionConstante;
+                tabla[i, 2] = interesMes;
+                tabla[i, 3] = seguroDesg;
+                tabla[i, 4] = seguroInc;
+                tabla[i, 5] = valorCuota;
+                tabla[i, 6] = Math.Abs(saldo);
             }
+
             return tabla;
         }
         private void ExportarExcel()
