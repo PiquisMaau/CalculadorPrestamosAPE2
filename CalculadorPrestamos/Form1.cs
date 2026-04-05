@@ -12,6 +12,7 @@ namespace CalculadorPrestamos
 {
     public partial class Form1 : Form
     {
+        DateTime fechaBase = DateTime.Now;
         public Form1()
         {
             InitializeComponent();
@@ -81,6 +82,7 @@ namespace CalculadorPrestamos
         private void button1_Click(object sender, EventArgs e)
         {
             ConfigurarTabla();
+
             if (string.IsNullOrWhiteSpace(textBoxMontoSolicitado.Text))
             {
                 MessageBox.Show("Debe ingresar un valor en Monto Solicitado.", "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -95,6 +97,8 @@ namespace CalculadorPrestamos
                 MessageBox.Show("Seleccione el tipo de amortización (Francés o Alemán).", "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
+            LlenarGridConMatriz(AmortizacionAlemana(), Convert.ToInt32(numericUpDownTiempoPagar.Value), fechaBase);
         }
 
         private void button1_KeyPress(object sender, KeyPressEventArgs e)
@@ -110,13 +114,39 @@ namespace CalculadorPrestamos
             }
         }
 
-        private decimal[,] AmortizacionFrancesa(decimal monto, decimal tasaInteresAnual, int plazoMeses)
-        {
-             //como 
-        }
-        private decimal[,] AmortizacionAlemana(decimal monto, decimal tasaInteresAnual, int plazoMeses)
-        {
+        //private decimal[,] AmortizacionFrancesa(decimal monto, decimal tasaInteresAnual, int plazoMeses)
+        //{
+        //     //como 
 
+        //}
+        public decimal[,] AmortizacionAlemana()
+        {
+            double monto = Convert.ToDouble(textBoxMontoSolicitado.Text);
+            int cuotas = Convert.ToInt32(numericUpDownTiempoPagar.Value);
+            double tasaInteresMensual = Convert.ToDouble(numericUpDownTasaInteres.Value) / 1200;
+            double tasaSeguro = 0.0014;
+            double gasto = monto * 0.005;
+            double capital = monto - gasto;
+            double amortizacion = Math.Round(capital / cuotas, 0);
+            double saldo = capital;
+            decimal[,] tabla = new decimal[cuotas, 7];
+            for (int i = 0; i < cuotas; i++)
+            {
+                double amortizacionCuota = amortizacion;
+                double interes = saldo * tasaInteresMensual;
+                double seguro = saldo * tasaSeguro;
+                double valorCuota = amortizacionCuota + interes + seguro;
+                double saldoFinal = saldo - amortizacionCuota;
+                tabla[i, 0] = i + 1;
+                tabla[i, 1] = Convert.ToDecimal(Math.Round(amortizacionCuota, 0));
+                tabla[i, 2] = Convert.ToDecimal(interes);
+                tabla[i, 3] = Convert.ToDecimal(seguro);
+                tabla[i, 4] = 0;
+                tabla[i, 5] = Convert.ToDecimal(valorCuota);
+                tabla[i, 6] = Convert.ToDecimal(saldoFinal);
+                saldo = saldoFinal;
+            }
+            return tabla;
         }
         private void ExportarExcel()
         {
@@ -139,18 +169,25 @@ namespace CalculadorPrestamos
             dataGridViewAmortizacion.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
-        private void LlenarGridConMatriz(decimal[,] matriz, int filas)
+        private void LlenarGridConMatriz(decimal[,] matriz, int filas, DateTime fechaInicio)
         {
             ConfigurarTabla();
 
+
             for (int i = 0; i < filas; i++)
             {
+                DateTime fechaPago = fechaInicio.AddMonths(i + 1);
                 dataGridViewAmortizacion.Rows.Add(
                     matriz[i, 0],
+                    fechaPago.ToString("yyyy-MM-dd"),
                     Math.Round(matriz[i, 1], 2), 
                     Math.Round(matriz[i, 2], 2),
                     Math.Round(matriz[i, 3], 2),
-                    Math.Round(matriz[i, 4], 2)
+                    Math.Round(matriz[i, 4], 2),
+                    Math.Round(matriz[i, 5], 2),
+                    Math.Round(matriz[i, 6], 2)
+                   // Math.Round(matriz[i, 7], 2)
+                    //Math.Round(matriz[i, 8], 2)
                 );
             }
         }
