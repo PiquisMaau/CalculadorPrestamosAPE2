@@ -70,7 +70,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Impact", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(219, 9);
+            this.label1.Location = new System.Drawing.Point(199, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(377, 29);
             this.label1.TabIndex = 1;
@@ -126,6 +126,7 @@
             this.button2.TabIndex = 11;
             this.button2.Text = "EXPORTAR EXCEL";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
@@ -274,6 +275,7 @@
             this.dataGridViewAmortizacion.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewAmortizacion.Location = new System.Drawing.Point(17, 267);
             this.dataGridViewAmortizacion.Name = "dataGridViewAmortizacion";
+            this.dataGridViewAmortizacion.ReadOnly = true;
             this.dataGridViewAmortizacion.RowTemplate.Height = 24;
             this.dataGridViewAmortizacion.Size = new System.Drawing.Size(771, 246);
             this.dataGridViewAmortizacion.TabIndex = 5;

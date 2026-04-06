@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ClosedXML.Excel;
 
 namespace CalculadorPrestamos
 {
@@ -76,7 +77,6 @@ namespace CalculadorPrestamos
 
         private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            InteresSegunTipo();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -134,6 +134,14 @@ namespace CalculadorPrestamos
             decimal tasaInteresMensual = (tasaInteresAnual / 100m) / 12m;
             decimal tasaSeguroDesg = 0.0014m;
             decimal tasaSeguroIncendios = 0.00m;
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "VIVIENDA DE INTERÉS PÚBLICO")
+            {
+                tasaSeguroIncendios = 0.0002m;
+            }
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "HIPOTECARIO VIVIENDA")
+            {
+                tasaSeguroIncendios = 0.00015m;
+            }
 
             decimal amortizacionConstante = monto / cuotas;
             decimal saldo = monto;
@@ -166,6 +174,14 @@ namespace CalculadorPrestamos
             decimal tasaInteresMensual = (tasaInteresAnual / 100m) / 12m;
             decimal tasaSeguroDesg = 0.0014m;
             decimal tasaSeguroIncendios = 0.00m;
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "VIVIENDA DE INTERÉS PÚBLICO")
+            {
+                tasaSeguroIncendios = 0.0002m;
+            }
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "HIPOTECARIO VIVIENDA")
+            {
+                tasaSeguroIncendios = 0.00015m;
+            }
 
             double i_double = (double)tasaInteresMensual;
             double n_double = (double)cuotas;
@@ -296,6 +312,66 @@ namespace CalculadorPrestamos
         private void comboBoxTipoCredito_SelectionChangeCommitted(object sender, EventArgs e)
         {
             InteresSegunTipo();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewAmortizacion.Rows.Count == 0)
+            {
+                MessageBox.Show("No hay datos para exportar. Calcule una tabla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "Archivos de Excel (*.xlsx)|*.xlsx";
+            if (comboBoxAmortizacion.Text == "ALEMANA" )
+            {
+                dialog.FileName = "AmortizacionAlemana_BanUTA_.xlsx";
+
+            }
+            else if (comboBoxAmortizacion.Text == "FRANCESA")
+            {
+                dialog.FileName = "AmortizacionFrancesa_BanUTA_.xlsx";
+            }
+
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    using (XLWorkbook workbook = new XLWorkbook())
+                    {
+                        var worksheet = workbook.Worksheets.Add("Tabla de Amortización");
+
+                        for (int i = 0; i < dataGridViewAmortizacion.Columns.Count; i++)
+                        {
+                            worksheet.Cell(1, i + 1).Value = dataGridViewAmortizacion.Columns[i].HeaderText;
+                            worksheet.Cell(1, i + 1).Style.Font.Bold = true;
+                            worksheet.Cell(1, i + 1).Style.Fill.BackgroundColor = XLColor.LightGray;
+                        }
+
+                        for (int i = 0; i < dataGridViewAmortizacion.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < dataGridViewAmortizacion.Columns.Count; j++)
+                            {
+                                if (dataGridViewAmortizacion.Rows[i].Cells[j].Value != null)
+                                {
+                                    worksheet.Cell(i + 2, j + 1).Value = dataGridViewAmortizacion.Rows[i].Cells[j].Value.ToString();
+                                }
+                            }
+                        }
+
+                        worksheet.Columns().AdjustToContents();
+                        workbook.SaveAs(dialog.FileName);
+
+                        MessageBox.Show("Excel exportado con éxito :)", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Hubo un error al guardar: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }
