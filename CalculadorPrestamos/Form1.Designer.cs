@@ -217,13 +217,14 @@
             "PRECISO",
             "HIPOTECARIO VIVIENDA",
             "EDUCACIÓN SUPERIOR",
-            "VIVIENDA DE INTERÉAS PÚBLICO",
-            "LIBRE"});
+            "VIVIENDA DE INTERÉS PÚBLICO",
+            "LIBRE(INTERÉS CUSTOM)"});
             this.comboBoxTipoCredito.Location = new System.Drawing.Point(138, 31);
             this.comboBoxTipoCredito.Name = "comboBoxTipoCredito";
             this.comboBoxTipoCredito.Size = new System.Drawing.Size(226, 24);
             this.comboBoxTipoCredito.TabIndex = 2;
             this.comboBoxTipoCredito.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            this.comboBoxTipoCredito.SelectionChangeCommitted += new System.EventHandler(this.comboBoxTipoCredito_SelectionChangeCommitted);
             this.comboBoxTipoCredito.Enter += new System.EventHandler(this.comboBox1_Enter);
             // 
             // numericUpDownTasaInteres

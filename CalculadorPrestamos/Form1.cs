@@ -76,7 +76,7 @@ namespace CalculadorPrestamos
 
         private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-
+            InteresSegunTipo();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -261,6 +261,41 @@ namespace CalculadorPrestamos
             dataGridViewAmortizacion.Columns.Clear();
 
             textBoxMontoSolicitado.Focus();
+        }
+        private void InteresSegunTipo()
+        {
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "PRECISO")
+            {
+                numericUpDownTasaInteres.Value = Convert.ToDecimal(15.60);
+                numericUpDownTasaInteres.Visible = true;
+            }
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "HIPOTECARIO VIVIENDA")
+            {
+                numericUpDownTasaInteres.Value = Convert.ToDecimal(10.10);
+                numericUpDownTasaInteres.Visible = true;
+               // label_ValorVivienda.Visible = true;
+               // textBox_ValorVivienda.Visible = true;
+            }
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "EDUCACIÓN SUPERIOR")
+            {
+                numericUpDownTasaInteres.Value = Convert.ToDecimal(9);
+                numericUpDownTasaInteres.Visible = true;
+            }
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "VIVIENDA DE INTERÉS PÚBLICO")
+            {
+                numericUpDownTasaInteres.Value = Convert.ToDecimal(4.87);
+                numericUpDownTasaInteres.Visible = true;
+            }
+            if (comboBoxTipoCredito.SelectedItem.ToString() == "LIBRE(INTERÉS CUSTOM)")
+            {
+                numericUpDownTasaInteres.Value = Convert.ToDecimal(0);
+                numericUpDownTasaInteres.Visible = true;
+            }
+        }
+
+        private void comboBoxTipoCredito_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            InteresSegunTipo();
         }
     }
 }
